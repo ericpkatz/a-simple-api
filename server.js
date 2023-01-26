@@ -1,15 +1,11 @@
 const express = require('express');
 const server = express();
-const pg = require('pg');
-const client = new pg.Client(process.env.DATABASE_URL || 'postgres://localhost/a_simple_db');
+const db = require('./db');
+const client = db.client;
 
 server.get('/api/things', async(req, res, next)=> {
   try {
-    const response = await client.query('SELECT * from things');
-    const things = response.rows.map(row => {
-      return {...row, hasLongName: row.name.length > 3}
-    });
-    res.send(things);
+    res.send(await db.getThings());
   }
   catch(ex){
     next(ex);
@@ -22,17 +18,7 @@ server.listen(port, async()=> {
   try {
     console.log(`listening on port ${port}`);
     await client.connect();
-    const SQL = `
-      DROP TABLE IF EXISTS things;
-      CREATE TABLE things(
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(20)
-      );
-      INSERT INTO things(name) VALUES('foo');
-      INSERT INTO things(name) VALUES('bar');
-      INSERT INTO things(name) VALUES('bazz');
-    `;
-    await client.query(SQL);
+    await db.syncAndSeed();
   }
   catch(ex){
     console.log(ex);
