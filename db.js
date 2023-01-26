@@ -4,7 +4,7 @@ const client = new pg.Client(process.env.DATABASE_URL || 'postgres://localhost/a
 
 const getThings = async()=> {
   const response = await client.query('SELECT * from things');
-  const things = response.rows.map(row => {
+  return response.rows.map(row => {
     return {...row, hasLongName: row.name.length > 3}
   });
 }

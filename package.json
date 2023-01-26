@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "DATABASE_URL=postgres://localhost/a_simple_test_db jest",
     "start:dev": "nodemon server",
     "test:dev": "npm run test -- --watch-all"
   },
