@@ -6,7 +6,10 @@ const client = new pg.Client(process.env.DATABASE_URL || 'postgres://localhost/a
 server.get('/api/things', async(req, res, next)=> {
   try {
     const response = await client.query('SELECT * from things');
-    res.send(response.rows);
+    const things = response.rows.map(row => {
+      return {...row, hasLongName: row.name.length > 3}
+    });
+    res.send(things);
   }
   catch(ex){
     next(ex);
